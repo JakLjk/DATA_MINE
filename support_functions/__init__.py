@@ -1,1 +1,1 @@
-from .selenium_support import driver_conenction_retry
+from .selenium_support import driver_connection_retry

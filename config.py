@@ -1,10 +1,13 @@
 class DBConf:
     __conf = {
-        "username": "",
-        "password": "",
+
+        "username": "localhost",
+        "password": "root",
+
         "MYSQL_PORT": 0000,
-        "MYSQL_DATABASE": '',
-        "MYSQL_DATABASE_TABLES": ['', '']
+        "MYSQL_HOSTNAME": 'localhost',
+        "MYSQL_DBNAME": "houses_data"
+        # "MYSQL_DATABASE_TABLES": ['', '']
     }
     __setters = ["username", "password"]
 
@@ -34,10 +37,6 @@ class DataManiConf:
     CLEAR_LINKS = True
     GET_PARSED_BEFORE_AGAIN = False
 
-class Links:
-    MAIN_LINK  = "https://www.otodom.pl/pl/oferty/sprzedaz/mieszkanie/slaskie?distanceRadius=0&market=ALL&locations=%5Bregions-12%5D&viewType=listing"
-    PARSED_MAIN_LINK = "https://www.otodom.pl/pl/oferty/sprzedaz/mieszkanie/slaskie?distanceRadius=0&market=ALL&locations=%5Bregions-12%5D&viewType=listing&page={}"
-    LINK_MAIN_PART  = "https://www.otodom.pl{}"
 
 
 

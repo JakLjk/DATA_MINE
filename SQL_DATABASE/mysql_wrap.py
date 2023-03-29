@@ -53,6 +53,9 @@ class Database:
             self.cursor.execute(f"""
             INSERT INTO {table_name} ({columns_parsed}) 
             VALUES ({values_parsed})""")
+
+    def insert_multiple_into_table(self):
+        pass
         
     def fetch_from_table(self, 
                          table_name, what_columns='*', 
@@ -233,5 +236,3 @@ class Database:
         statement = " AND ".join(
                 [f"{str(k)} = {str(k)} + '{str(v)}'" for k,v in dictionary.items()])
         return statement
-
-d =1

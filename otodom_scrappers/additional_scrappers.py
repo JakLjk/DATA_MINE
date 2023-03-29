@@ -2,7 +2,8 @@ from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
 
-from config import Links, DriverConf
+from config import DriverConf
+from otodom_config import Links
 
 def get_num_pages() -> int:
     """Used to get value of last page with offers that is being listed on webpage"""

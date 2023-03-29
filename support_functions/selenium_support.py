@@ -2,7 +2,7 @@ from time import sleep
 
 
 # TODO try passing logging as argument, if not passed - user does not want to log 
-def driver_conenction_retry(driver, 
+def driver_connection_retry(driver, 
                             url, 
                             retry_intervals: list, 
                             raise_error = True, 
