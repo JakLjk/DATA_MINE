@@ -1,6 +1,6 @@
 db_structure.py
 db_structure_addon_mysql_wrap.py
-config.py
+# config.py
 otodom_config.py
 
 # Byte-compiled / optimized / DLL files

@@ -54,8 +54,34 @@ class Database:
             INSERT INTO {table_name} ({columns_parsed}) 
             VALUES ({values_parsed})""")
 
-    def insert_multiple_into_table(self):
-        pass
+    def insert_multiple_into_table(self, table_name,
+                                    col_names:list,
+                                    data:list):
+        
+        """Experimental for adding multiple rows"""
+        num_types = (int, float)
+
+        columns_sql = ",".join(col_names)
+        columns_sql = f"({columns_sql})"
+        values_sql_list = []
+
+        for row in data:
+            if type(row) == list:
+                row =  ",".join([val if type(val) in num_types else f"\"{val}\"" for val in row])
+            if type(row) == str:
+                row = f"'{row}'"
+            elif type(row) not in num_types:
+                raise ValueError(f"DataType not supported: {type(row)}")
+            row = f"({row})"
+            values_sql_list.append(row)
+
+        values_sql_list = ",".join(values_sql_list)
+
+        self.cursor.execute(f"""
+            INSERT INTO {table_name} {columns_sql}
+            VALUES {values_sql_list}""")
+        
+
         
     def fetch_from_table(self, 
                          table_name, what_columns='*', 

@@ -7,9 +7,9 @@ from standard_scrape_handling import scrape_links
 
 def main():
     # actions that are needed:
-    # 
 
     scrape_links()
+    
 
 
     # configure:

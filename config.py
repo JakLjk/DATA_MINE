@@ -1,8 +1,8 @@
 class DBConf:
     __conf = {
-
-        "username": "localhost",
-        "password": "root",
+        # Since config is not excempted in gitignore, don't put creds here
+        "username": "root",
+        "password": "",
 
         "MYSQL_PORT": 0000,
         "MYSQL_HOSTNAME": 'localhost',
@@ -21,7 +21,9 @@ class DBConf:
             DBConf.__conf[name] = value
         else:
             raise NameError("Name not accepted in set() method")
-        
+
+
+# TODO standardize DriverConf, to be usable with multiple different scrappers
 class DriverConf:
     HEADLESS = True
     WAIT_UNTIL_PAGE_LOADED = 1.6

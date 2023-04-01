@@ -7,7 +7,7 @@ import bs4
 
 from config import DriverConf
 from custom_errors import ScrapeFailure
-from support_functions import driver_connection_retry
+from support_functions.selenium_support import driver_connection_retry
 
 def get_offer_links_from_page(page_link) -> list('offer_link', ):
         options = Options()
