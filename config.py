@@ -25,19 +25,19 @@ class DBConf:
 
 # TODO standardize DriverConf, to be usable with multiple different scrappers
 class DriverConf:
-    HEADLESS = True
+    HEADLESS = False
     WAIT_UNTIL_PAGE_LOADED = 1.6
     ANTI_THROTTLE_WAIT = 4
-    THROTTLE_REPEATS = [10,30,45,90,120]
+    THROTTLE_REPEATS = [10,30,45]
     SITE_LOAD_SCROLL_PAUSETIME = 0.05
     SITE_LOAD_AFTER_SCROLL_PAUSETIME = 1.2
 
 class LoggingConf:
     LOG_FILE_PATH_NAME = ""
 
-class DataManiConf:
+class DataMineConf:
     CLEAR_LINKS = True
-    GET_PARSED_BEFORE_AGAIN = False
+    MINE_LINKS_SCRAPPED_IN_PAST= False
 
 
 

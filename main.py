@@ -1,15 +1,19 @@
 
-from standard_scrape_handling import scrape_links
+from standard_scrape_handling import scrape_links, scrape_parcel_data
 
-
+from logger import logger
 
 
 
 def main():
+    # Start logging configuration
+
+    logger.info("Logger -test-")
+
     # actions that are needed:
 
-    scrape_links()
-    
+    # scrape_links()
+    scrape_parcel_data()
 
 
     # configure:

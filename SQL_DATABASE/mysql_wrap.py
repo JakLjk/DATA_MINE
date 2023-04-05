@@ -22,7 +22,7 @@ class Database:
             raise Error(f"There was a problem with initialising database: \n{err}")
         
     def execute_query(self, query):
-        """General methond for  """
+        """ """
         try:
             self.cursor.execute(query)
         except Error as err:
@@ -55,11 +55,14 @@ class Database:
             VALUES ({values_parsed})""")
 
     def insert_multiple_into_table(self, table_name,
-                                    col_names:list,
+                                    col_names:str or list,
                                     data:list):
         
         """Experimental for adding multiple rows"""
         num_types = (int, float)
+
+        if isinstance(col_names, str):
+            col_names = [col_names]
 
         columns_sql = ",".join(col_names)
         columns_sql = f"({columns_sql})"
@@ -262,3 +265,35 @@ class Database:
         statement = " AND ".join(
                 [f"{str(k)} = {str(k)} + '{str(v)}'" for k,v in dictionary.items()])
         return statement
+
+    def get_col_max_val(self, table_name, col_name):
+        self.cursor.execute(f"SELECT MAX({col_name}) FROM {table_name}")
+        return self.cursor.fetchall()[0][0]
+    
+    def get_distinct_col(self, table, column_name):
+        """"""
+        query = self.cursor.execute(f"""
+        SELECT DISTINCT {column_name} FROM {table}
+        """)
+        return self.cursor.fetchall()
+
+    def get_distinct_not_in_table2(self, table1, table2, column_name, column_name_table_2=""):
+        """"""
+        if not column_name_table_2:
+            column_name_table_2 = column_name
+        query = self.cursor.execute(f"""
+        SELECT DISTINCT t1.{column_name} FROM {table1} AS t1
+        LEFT JOIN {table2} t2 ON t2.{column_name_table_2} = t1.{column_name} 
+        WHERE t2.{column_name_table_2} IS NULL
+        """)
+        return [value[0] for value in self.cursor.fetchall()]
+    
+    def count_rows(self, table_name, where=''):
+        if where == '':
+            self.cursor.execute(f"SELECT * FROM {table_name}")
+            self.cursor.fetchall()
+            return self.cursor.rowcount
+        else:
+            self.cursor.execute(f"SELECT * FROM {table_name} WHERE {where}")
+            self.cursor.fetchall()
+            return self.cursor.rowcount
