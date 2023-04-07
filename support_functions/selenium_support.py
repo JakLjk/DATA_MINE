@@ -10,7 +10,6 @@ def driver_connection_retry(driver,
     connection_established = False
     for i, interval in enumerate(retry_intervals):
         try: 
-            print(url)
             driver.get(url)
             connection_established = True
             break

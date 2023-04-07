@@ -7,7 +7,7 @@ import bs4
 
 from logger import logger
 
-from config import DriverConf
+from .otodom_config import DriverConf
 from custom_errors import ScrapeFailure
 from support_functions.selenium_support import driver_connection_retry
 
@@ -30,9 +30,9 @@ def get_offer_links_from_page(page_link:str) -> list:
         try:
             all_link_elems = elements_no_promo.find_all("a",
                 {"data-cy":"listing-item-link"})
-        except AttributeError as err:
+        except AttributeError as ae:
             logger.critical("There was a problem parsing page:")
             logger.critical(page_link)
-            logger.critical(f"Error: {err}")
+            logger.critical(f"Error: {ae}")
             raise ScrapeFailure("Unable to properly scrape this page")
         return [elem['href'] for elem in all_link_elems]

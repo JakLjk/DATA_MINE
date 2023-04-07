@@ -1,13 +1,14 @@
 class DBConf:
+    """Standard db configuration parameters,
+    Which can be changed / added when program is iniialised"""
     __conf = {
-        # Since config is not excempted in gitignore, don't put creds here
+
         "username": "root",
         "password": "",
 
-        "MYSQL_PORT": 0000,
+        "MYSQL_PORT": None,
         "MYSQL_HOSTNAME": 'localhost',
         "MYSQL_DBNAME": "houses_data"
-        # "MYSQL_DATABASE_TABLES": ['', '']
     }
     __setters = ["username", "password"]
 
@@ -22,23 +23,13 @@ class DBConf:
         else:
             raise NameError("Name not accepted in set() method")
 
-
-# TODO standardize DriverConf, to be usable with multiple different scrappers
-class DriverConf:
-    HEADLESS = False
-    WAIT_UNTIL_PAGE_LOADED = 1.6
-    ANTI_THROTTLE_WAIT = 4
-    THROTTLE_REPEATS = [10,30,45]
-    SITE_LOAD_SCROLL_PAUSETIME = 0.05
-    SITE_LOAD_AFTER_SCROLL_PAUSETIME = 1.2
-
 class LoggingConf:
+    """Path for logging file"""
     LOG_FILE_PATH_NAME = ""
 
-class DataMineConf:
-    CLEAR_LINKS = True
-    MINE_LINKS_SCRAPPED_IN_PAST= False
 
+class Misc:
+    FunctionRetries = 3
 
 
 

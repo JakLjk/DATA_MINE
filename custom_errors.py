@@ -1,2 +1,3 @@
 class ScrapeFailure(Exception):
     pass
+

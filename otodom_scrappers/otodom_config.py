@@ -20,25 +20,19 @@ class DBOfferDetails:
     table_scrapdate_col = "scrap_date"
     table_scrapiter_col = "scrap_iter"
     table_link_col = "link_string"
-    table_structure = [		
-"offer_title",	
-"offer_price",	
-"offer_address",	
-"coordinates",	
-"are_coords_exact",	
-"Powierzchnia",	
-"Forma własności",	
-"Liczba pokoi",	
-"Stan wykończenia",	
-"Piętro",	
-"Balkon / ogród / taras",	
-"Czynsz",	
-"Miejsce parkingowe",	
-"Obsługa zdalna",	
-"Ogrzewanie",	
-"Rynek",	
-"Typ ogłoszeniodawcy",	
-"Dostępne od",	
-"Rok budowy",	
-"Rodzaj zabudowy",	
-]
+    
+    table_structure = [""]
+
+
+
+class DriverConf:
+    """Configuration for selenium driver
+    Currently working only on firefox"""
+
+    # TODO add support for multiple browsers
+    HEADLESS = True
+    WAIT_UNTIL_PAGE_LOADED = 1.6
+    ANTI_THROTTLE_WAIT = 4
+    THROTTLE_REPEATS = [10,30,45]
+    SITE_LOAD_SCROLL_PAUSETIME = 0.05
+    SITE_LOAD_AFTER_SCROLL_PAUSETIME = 1.2

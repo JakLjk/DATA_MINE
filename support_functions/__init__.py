@@ -1,1 +1,2 @@
-# from .selenium_support import driver_connection_retry
+# Support functions should be reffered by full path, for 
+# the sake of clarity

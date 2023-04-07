@@ -4,7 +4,7 @@ from selenium.webdriver.common.by import By
 
 
 from .otodom_config import Links
-from config import DriverConf
+from .otodom_config import DriverConf
 
 def get_num_pages() -> int:
     """Used to get value of last page with offers that is being listed on webpage"""
