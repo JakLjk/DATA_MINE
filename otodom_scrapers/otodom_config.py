@@ -2,9 +2,10 @@ class Links:
     MAIN_DOMAIN = "https://www.otodom.pl"
     MAIN_LINK  = "https://www.otodom.pl/pl/oferty/sprzedaz/mieszkanie/slaskie?distanceRadius=0&market=ALL&locations=%5Bregions-12%5D&viewType=listing"
     PARSED_MAIN_LINK = "https://www.otodom.pl/pl/oferty/sprzedaz/mieszkanie/slaskie?distanceRadius=0&market=ALL&locations=%5Bregions-12%5D&viewType=listing&page={}"
-    LINK_MAIN_PART  = "https://www.otodom.pl{}"
 
-
+class ScrapeConfig:
+    delete_old_links = False
+    mine_links_scraped_in_past = False
 
 class DBOfferLinks:
     table_name = "parcel_links"
@@ -24,7 +25,6 @@ class DBOfferDetails:
     table_structure = [""]
 
 
-
 class DriverConf:
     """Configuration for selenium driver
     Currently working only on firefox"""
@@ -36,3 +36,6 @@ class DriverConf:
     THROTTLE_REPEATS = [10,30,45]
     SITE_LOAD_SCROLL_PAUSETIME = 0.05
     SITE_LOAD_AFTER_SCROLL_PAUSETIME = 1.2
+
+
+    

@@ -1,6 +1,9 @@
 from time import sleep
-from logger import logger
 
+class RetryFailure(Exception):
+    pass
+
+# TODO add retry only for specified exception
 def function_retry(function, 
                     args, 
                     retries: list or int, 
@@ -22,15 +25,10 @@ def function_retry(function,
             connection_established = True
             return f
         except Exception as e:
-            logger.error(f'Error has occured while executing function {function.__name__}')
-            logger.error(f"Raised exception: {e}")
-
             if isinstance(retries, list):
-                logger.error(f"Retry {i+1} / {len(retries)}, In {interval} seconds")
                 sleep(interval)
-            else:
-                logger.error(f"Retry {i+1} / {len(retries)}")
+
 
     if connection_established == False: 
-        if raise_error: raise Exception(f"Unable to execute function: {function.__name__} ")
+        if raise_error: raise RetryFailure(f"Unable to execute function: {function.__name__} ")
         else: return None

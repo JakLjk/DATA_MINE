@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
 
-import mysql.connector
-from mysql.connector import Error
+
 import pandas as pd
 import time
 import re
+import mariadb
+
+
+# NOT YET IMPLEMENTED
+
 
 class Database:
     """Class providing general sql handling methods,
@@ -12,21 +16,22 @@ class Database:
     gives partial support for pandas dataframe"""
     def __init__(self, host_name:str, user:str, user_passwd:str, db_name:str):
         try:
-            self.connection = mysql.connector.connect(
+            self.connection = mariadb.connect(
                 host=host_name,
                 user=user,
                 passwd=user_passwd,
                 database=db_name)
+            self.connection.autocommit = False
             self.cursor = self.connection.cursor()
-        except Error as err:
-            raise Error(f"There was a problem with initialising database: \n{err}")
+        except mariadb.Error as err:
+            raise mariadb.Error(f"There was a problem with initialising database: \n{err}")
         
     def execute_query(self, query):
         """ """
         try:
             self.cursor.execute(query)
-        except Error as err:
-            raise Error(err)
+        except mariadb.Error as err:
+            raise mariadb.Error(err)
 
     def insert_into_table(self, 
                           table_name, 
@@ -53,6 +58,9 @@ class Database:
             INSERT INTO {table_name} ({columns_parsed}) 
             VALUES {values_parsed}""")
         else:
+            print(f"""
+            INSERT INTO {table_name} ({columns_parsed}) 
+            VALUES ({values_parsed})""")
             self.cursor.execute(f"""
             INSERT INTO {table_name} ({columns_parsed}) 
             VALUES ({values_parsed})""")
@@ -308,9 +316,7 @@ class Database:
         return statement
 
     def _remove_qoutes(self, parse_values: list or str):
+
         if isinstance(parse_values, str):
             parse_values = [parse_values]
         return [s.replace('"', "\'\'") if isinstance(s, str) else s for s in parse_values]
-
-
-

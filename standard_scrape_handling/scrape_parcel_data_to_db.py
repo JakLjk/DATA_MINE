@@ -1,5 +1,4 @@
-from otodom_scrappers.otodom_config import DBOfferDetails, DBOfferLinks
-from support_functions.std_function_retry import function_retry
+from support_functions.std_function_retry import function_retry, RetryFailure
 from logger import logger
 
 
@@ -38,10 +37,13 @@ def scrape_parcel_data(
     num_of_links = len(links_to_parse)
     for i, link in enumerate(links_to_parse):
         logger.info(f"Gathering data about parcel {i+1}/{num_of_links}")
-        offer_details = function_retry(function = get_offer_function,
-                                       args = link,
-                                       retries=3)
-
+        try:
+            offer_details = function_retry(function = get_offer_function,
+                                        args = link,
+                                        retries=3)
+        except RetryFailure:
+            logger.info(f"Failed to get offer details, skipping...")
+            continue
 
         offer_details[DBOfferDetails.table_runtype_col] = run_type
         offer_details[DBOfferDetails.table_scrapdate_col] = db_con.get_sql_date()

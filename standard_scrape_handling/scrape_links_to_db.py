@@ -1,5 +1,7 @@
 from custom_errors import ScrapeFailure
 from logger import logger
+from support_functions.std_function_retry import function_retry
+
 
 # Get number of links
 # TODO implement delete_old_links_from_db = False 
@@ -9,7 +11,8 @@ def scrape_links(
         db_con = None,
         scraper_config = None,
         num_pages_function = None,
-        links_scrapper_function = None,):
+        links_scrapper_function = None,
+        max_failed_link_pages_in_row = 3 ):
     
     Links = scraper_config.Links
     DBOfferLinks = scraper_config.DBOfferLinks
@@ -28,9 +31,21 @@ def scrape_links(
                         for i in range(num_pages_to_parse, 0, -1))
     
     # TODO add threading support
+
+    link_page_failure = 0
     for i, page_link in enumerate(page_links_generator):
         logger.info(f"Getting links from page {i+1}/{num_pages_to_parse}")
-        offer_links = links_scrapper_function(page_link)
+        try: 
+            offer_links = links_scrapper_function(page_link)
+        except:
+            link_page_failure += 1
+            logger.warning(f"Failed while getting links from page.")
+            logger.warning(f"Retry {link_page_failure} / {max_failed_link_pages_in_row}")
+            if link_page_failure > max_failed_link_pages_in_row:
+                raise ScrapeFailure("""Too many failures, while scraping first pages. 
+                Most probably index has moved and such pages do not exist anymore""")
+            continue
+            
 
         if append_domain_to_link:
             offer_links = [domain_name + link for link in offer_links]
