@@ -1,7 +1,7 @@
 class Links:
     MAIN_DOMAIN = "https://www.otodom.pl"
-    MAIN_LINK  = "https://www.otodom.pl/pl/oferty/sprzedaz/mieszkanie/cala-polska?viewType=listing"
-    PARSED_MAIN_LINK = "https://www.otodom.pl/pl/oferty/sprzedaz/mieszkanie/cala-polska?viewType=listing&page={}"
+    MAIN_LINK  = "https://www.otodom.pl/pl/oferty/sprzedaz/mieszkanie/slaskie?distanceRadius=0&locations=%5Bregions-12%5D&viewType=listing"
+    PARSED_MAIN_LINK = "https://www.otodom.pl/pl/oferty/sprzedaz/mieszkanie/slaskie?distanceRadius=0&locations=%5Bregions-12%5D&viewType=listing&page={}"
 
 class ScrapeConfig:
     delete_old_links = True
