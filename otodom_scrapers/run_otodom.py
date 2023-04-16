@@ -23,8 +23,7 @@ def run_scraping(edit_db_creds = True,
                     input("Database username: "))
         db_cred.set("password",
                     getpass("Database password: "))
-        db_cred.set("database_name",
-                    input("Database name: "))
+        db_cred.set("database_name", otodom_config.DBDetails.db_name)
     else:
         raise DBConf.CredentialsError("Credentials have to be specified manually")
 

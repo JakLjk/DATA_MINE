@@ -31,6 +31,37 @@ def get_offer_details(link: str) -> dict:
                 driver.execute_script(f"window.scrollTo(0, {str(curren_scroll_px)})")
                 sleep(DriverConf.SITE_LOAD_SCROLL_PAUSETIME)
         sleep(DriverConf.SITE_LOAD_AFTER_SCROLL_PAUSETIME)
+        
+        # Seller details is an popup that can show, after pressing button that reveals phone number
+        seller_details = None
+
+        # Hiding cookie popup
+        try:
+                cookie_button = driver.find_element(By.ID,"onetrust-accept-btn-handler")
+                cookie_button.click()
+        except:
+                logger.info("Cookie popup wasn't closed (It is possible that it has not shown)")
+                logger.info(f"Link: {link}")
+
+        # Uncovering phone number:
+        try:
+                phone_button = driver.find_element(By.CSS_SELECTOR,"div.css-1pyh82i:nth-child(1) > div:nth-child(1) > div:nth-child(4) > div:nth-child(1) > button:nth-child(2)")
+                phone_button.click()
+
+                # If popup with additional info pops up:
+                try:
+                        # Get additional seller details for analysis
+                        seller_details = driver.find_element(By.XPATH, "//div[@class='css-1kqtaqd e1bxdpug0']").get_attribute('innerHTML')  
+                        seller_details = bs4.BeautifulSoup(seller_details, 'html.parser')                 
+                        pup_up_close = driver.find_element(By.CSS_SELECTOR, ".css-1ex6smy")
+                        pup_up_close.click()
+                except Exception as e:
+                        logger.info("Additional seller_details popup wasn't closed (It is possible that it has not shown)")
+                        logger.info(f"Link: {link}")
+                        
+        except Exception as e:
+                logger.info("Phone button wasn't clicked (It may not be available)")
+                logger.info(f"Link: {link}")
 
         page_html = driver.page_source
         driver.quit()
@@ -38,18 +69,65 @@ def get_offer_details(link: str) -> dict:
         soup = bs4.BeautifulSoup(page_html, 'html.parser')
         full_offer_info = {}
 
+
+        # Scrape main offer info
         try:
-                # Scrape main offer info
+                
                 full_offer_info['link_string'] = link
                 full_offer_info['offer_title'] = soup.find('h1', {'data-cy':'adPageAdTitle'}).get_text().strip()
                 full_offer_info['offer_price'] = soup.find('strong', {'data-cy':'adPageHeaderPrice'}).get_text().strip()
                 full_offer_info['offer_address'] = soup.find('a',{'aria-label':'Adres'}).get_text().strip()
         except AttributeError as ae:
-                logger.error("Could not fetch data about parcel - Site was deleted or hasn't been poperly loaded.")
+                logger.error("Could not fetch data about parcel - Site was deleted or hasn't been properly loaded.")
                 logger.error(f"Error page link: {link}")
-                logger.error(f"Exception: {ae}")
+                raise ae
+
+        # Scrape contact info
+        try:
+                contact_name = soup.find('span', {'class':'css-1yijy9r es5t28b4'}).get_text()
+                # Type of business that is offering this parcel
+                offer_type = soup.find('div', {'class':'css-ubt094 es5t28b7'}).get_text()
+
+                full_offer_info['selling_agent_name'] = contact_name
+                full_offer_info['selling_firm_type'] = offer_type
+        except AttributeError as ea:
+                logger.error("Could not fetch contact information")
                 raise ae
         
+        try:
+                phone_number = soup.find('a', {'class':'css-1g26sdq'}).get_text()
+                full_offer_info['seller_phone_num'] = phone_number
+        except AttributeError as ae:
+                logger.error("Could not fetch phone number (may not be available)")
+                logger.error(f"Link: {link}")
+
+        if seller_details:
+                try:
+                        company_name = seller_details.find('strong',{'class':'css-1475nf7 e1bxdpug7'}).get_text()
+                except Exception as ae:
+                        logger.error(ae)   
+                        logger.error("Could not fetch company_namer (may not be available)")
+                        logger.error(f"Link: {link}")
+                        company_name = None
+                try:
+                        company_site_link = soup.find('img', {'class':'css-1ga2hw8 e10zojt31'})['src']
+                except Exception as ae:
+                        logger.error(ae)   
+                        logger.error("Could not fetch company_site_link (may not be available)")
+                        logger.error(f"Link: {link}")                     
+                        company_site_link = None
+                try: 
+                        company_address = seller_details.find('span', {'class':'css-mzpff5 e1bxdpug10'}).get_text()
+
+                except Exception as ae:
+                        logger.error(ae)   
+                        logger.error("Could not fetch company_address (may not be available)")
+                        logger.error(f"Link: {link}")                        
+                        company_address = None
+                full_offer_info['selling_firm_name'] = company_name
+                full_offer_info['selling_firm_site'] = company_site_link
+                full_offer_info['selling_firm_addr'] = company_address
+
         try:
                 # get coordinates from google maps embedded widged
                 coordinates_raw_1 = soup.find('div', {'class', 'gm-style'})
@@ -59,7 +137,6 @@ def get_offer_details(link: str) -> dict:
                 full_offer_info['are_coords_exact'] = True if soup.find('div', {'class':'css-3te2t7 ej9jroc0'}) == None else False
         except AttributeError as ae:
                 logger.error(f"There was a problem with finding |COORIDATES| - Try increasing |SITE_LOAD_SCROLL_PAUSETIME| ")
-                logger.error(f"Exception: {ae}")
                 full_offer_info['coordinates'] = None
                 full_offer_info['are_coords_exact'] = None
                 raise ae
@@ -71,7 +148,6 @@ def get_offer_details(link: str) -> dict:
                 logger.error(f"Could not fetch main details container")
                 logger.error(f"Most probably site was not loaded properly, or site structure changed ")
                 logger.error(f"Error page link: {link}")
-                logger.error(f"Exception: {ae}")
                 raise ae
         
         for dnv in details_name_value:
@@ -98,5 +174,13 @@ def get_offer_details(link: str) -> dict:
                 logger.error(f"There was problem with fetching additional information from link {link}")
                 logger.error(f"Most probably such information is not available")
                 logger.error(f"Exception {ae}")
-
+        
+        try:
+                added_when_info = soup.find('div', {'class':'css-1soi3e7 e16xl7024'}).get_text()
+                last_offer_update_when = soup.find('div', {'class':'css-9dilgw e16xl7025'}).get_text()
+                full_offer_info['added_when'] = added_when_info
+                full_offer_info['last_offer_update'] = last_offer_update_when
+        except AttributeError as ae:
+                logger.error(f"There was problem with fetching offer add/update information {link}")
+                logger.error(f"Exception {ae}")
         return full_offer_info

@@ -1,12 +1,15 @@
 class Links:
     MAIN_DOMAIN = "https://www.otodom.pl"
-    MAIN_LINK  = "https://www.otodom.pl/pl/oferty/sprzedaz/mieszkanie/slaskie?distanceRadius=0&market=ALL&locations=%5Bregions-12%5D&viewType=listing"
-    PARSED_MAIN_LINK = "https://www.otodom.pl/pl/oferty/sprzedaz/mieszkanie/slaskie?distanceRadius=0&market=ALL&locations=%5Bregions-12%5D&viewType=listing&page={}"
+    MAIN_LINK  = "https://www.otodom.pl/pl/oferty/sprzedaz/mieszkanie/cala-polska?viewType=listing"
+    PARSED_MAIN_LINK = "https://www.otodom.pl/pl/oferty/sprzedaz/mieszkanie/cala-polska?viewType=listing&page={}"
 
 class ScrapeConfig:
-    delete_old_links = False
+    delete_old_links = True
     mine_links_scraped_in_past = False
 
+
+class DBDetails:
+    db_name = "houses_data"
 class DBOfferLinks:
     table_name = "parcel_links"
 
@@ -31,11 +34,10 @@ class DriverConf:
 
     # TODO add support for multiple browsers
     HEADLESS = True
-    WAIT_UNTIL_PAGE_LOADED = 1.6
-    ANTI_THROTTLE_WAIT = 4
+    WAIT_UNTIL_PAGE_LOADED = 0.6
     THROTTLE_REPEATS = [10,30,45]
     SITE_LOAD_SCROLL_PAUSETIME = 0.05
-    SITE_LOAD_AFTER_SCROLL_PAUSETIME = 1.2
+    SITE_LOAD_AFTER_SCROLL_PAUSETIME = 1.0
 
 
     

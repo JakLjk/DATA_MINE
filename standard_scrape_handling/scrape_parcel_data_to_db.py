@@ -38,11 +38,14 @@ def scrape_parcel_data(
     for i, link in enumerate(links_to_parse):
         logger.info(f"Gathering data about parcel {i+1}/{num_of_links}")
         try:
+            # TODO add retry only on specific raise error
             offer_details = function_retry(function = get_offer_function,
                                         args = link,
-                                        retries=3)
+                                        retries=3,)
         except RetryFailure:
+            # TODO delete row with bad link
             logger.info(f"Failed to get offer details, skipping...")
+            logger.info(f"Offer link: {link}")
             continue
 
         offer_details[DBOfferDetails.table_runtype_col] = run_type
