@@ -39,13 +39,22 @@ def scrape_parcel_data(
         logger.info(f"Gathering data about parcel {i+1}/{num_of_links}")
         try:
             # TODO add retry only on specific raise error
-            offer_details = function_retry(function = get_offer_function,
-                                        args = link,
-                                        retries=3,)
+            # offer_details = function_retry(function = get_offer_function,
+            #                             args = link,
+            #                             retries=3,)
+            offer_details = get_offer_function(link)
         except RetryFailure:
             # TODO delete row with bad link
             logger.info(f"Failed to get offer details, skipping...")
             logger.info(f"Offer link: {link}")
+            continue
+
+        if offer_details is None:
+            db_con.detele_rows_containing(
+                            table_name=DBOfferDetails.table_name, 
+                            column_name=DBOfferDetails.table_link_col, 
+                            value=link)
+            logger.info(f"DELETED Faulty link from db: {link}")
             continue
 
         offer_details[DBOfferDetails.table_runtype_col] = run_type
@@ -54,8 +63,12 @@ def scrape_parcel_data(
         offer_details[DBOfferDetails.table_link_col] = link
 
         logger.info(f"Inserting parcel data into Database")
-        db_con.insert_into_table(DBOfferDetails.table_name,
-                                 offer_details)
+        # TESTING --------------
+        db_con.make_lacking_column_insert_into_table(DBOfferDetails.table_name,
+                                                     offer_details)
+        # Old way that did not allow for inserting new cols:
+        # db_con.insert_into_table(DBOfferDetails.table_name,
+        #                          offer_details)
         db_con.commit()
         logger.info(f"Parcel data successfully inserted into db")
 

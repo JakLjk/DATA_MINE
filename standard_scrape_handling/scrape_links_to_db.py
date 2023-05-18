@@ -1,8 +1,7 @@
-from custom_errors import ScrapeFailure
 from logger import logger
+from custom_errors import ScrapeFailure
 from support_functions.std_function_retry import function_retry
-
-
+from time import sleep
 # Get number of links
 # TODO implement delete_old_links_from_db = False 
 def scrape_links(
@@ -15,6 +14,7 @@ def scrape_links(
         max_failed_link_pages_in_row = 3 ):
     
     Links = scraper_config.Links
+    DriverConfig = scraper_config.DriverConf
     DBOfferLinks = scraper_config.DBOfferLinks
 
     if delete_old_links:
@@ -32,20 +32,26 @@ def scrape_links(
     
     # TODO add threading support
 
-    link_page_failure = 0
+
+    repeats = DriverConfig.THROTTLE_REPEATS_FOR_LINKS_SCRAPPER
     for i, page_link in enumerate(page_links_generator):
         logger.info(f"Getting links from page {i+1}/{num_pages_to_parse}")
-        try: 
-            offer_links = links_scrapper_function(page_link)
-        except:
-            link_page_failure += 1
-            logger.warning(f"Failed while getting links from page.")
-            logger.warning(f"Retry {link_page_failure} / {max_failed_link_pages_in_row}")
-            if link_page_failure > max_failed_link_pages_in_row:
-                raise ScrapeFailure("""Too many failures, while scraping first pages. 
-                Most probably index has moved and such pages do not exist anymore""")
-            continue
-            
+        repeat = True
+        link_page_failure = 0
+        while repeat:
+            try: 
+                offer_links = links_scrapper_function(page_link)
+                repeat = False
+            except:
+                logger.warning(f"Failed while getting links from page.")
+                link_page_failure += 1
+                if link_page_failure >= len(repeats):
+                    repeat = False
+                    raise ScrapeFailure("""Too many failures, while scraping first pages. 
+                    Most probably index has moved and such pages do not exist anymore""")
+
+                continue
+                
 
         if append_domain_to_link:
             offer_links = [domain_name + link for link in offer_links]

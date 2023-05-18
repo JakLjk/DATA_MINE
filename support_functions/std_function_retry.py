@@ -1,4 +1,5 @@
 from time import sleep
+from logger import logger
 
 class RetryFailure(Exception):
     pass
@@ -17,6 +18,8 @@ def function_retry(function,
         retries = range(retries)
 
     for i, interval in enumerate(retries):
+        if i != 0:
+            logger.error(f"Retry {i+1}")
         try: 
             if isinstance(args, tuple):
                 f = function(*args)

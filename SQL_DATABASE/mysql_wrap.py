@@ -57,6 +57,79 @@ class Database:
             INSERT INTO {table_name} ({columns_parsed}) 
             VALUES ({values_parsed})""")
 
+    
+    def make_lacking_column_insert_into_table(self, 
+                          table_name, 
+                          column_data:dict,
+                          check_forbidden_values=True):
+        """!Requires separate use of commit method,
+        in order to save changes to db.
+
+        Column data takes unlimited amount of key:val pairs,
+        where key corresponds to column in which we want to 
+        append and val is the value which will be inserted
+        """
+        REPLACE = {
+            "ą":"a",
+            "ź":"z",
+            "ż":"z",
+            "ł":"l",
+            " ":"_",
+            "ć":"c",
+            "ń":"n",
+            "ś":"s",
+            "ó":"o",
+            "ę":"e",
+            "(":"",
+            ")":""
+            }
+        col_names_list = list(column_data.keys())
+
+        # remove spaces
+        for old_val, new_val in REPLACE.items():
+            col_names_list = [col_name.replace(old_val.lower(), new_val.lower()) for col_name in col_names_list]
+            col_names_list = [col_name.replace(old_val.lower(), new_val.lower()) for col_name in col_names_list]
+
+        for col_name in col_names_list:
+            if not self._does_col_name_exist(table_name, col_name):
+                self._create_new_column(
+                    table_name = table_name,
+                    col_name=col_name,
+                    sql_col_data_type="TEXT",)
+
+        col_names_list = [f"`{name}`" for name in col_names_list]
+        columns_parsed = ",".join(col_names_list)
+        values_list = list(column_data.values())
+        if check_forbidden_values:
+            values_list = self._remove_qoutes(values_list)
+        values_parsed = ",".join([f"\"{val}\"" for val in values_list])
+
+        if type(values_parsed) == tuple:
+            self.cursor.execute(f"""
+            INSERT INTO {table_name} ({columns_parsed}) 
+            VALUES {values_parsed}""")
+        else:
+            self.cursor.execute(f"""
+            INSERT INTO {table_name} ({columns_parsed}) 
+            VALUES ({values_parsed})""")
+
+    def _does_col_name_exist(self, table_name, col_name):
+        query = f"""SELECT column_name
+                    FROM information_schema.columns 
+                    WHERE table_name = '{table_name}' 
+                    AND column_name = '{col_name}'"""
+        self.cursor.execute(query)
+        exists = bool(self.cursor.fetchone())
+        return exists
+
+    def _create_new_column(self, table_name, col_name, sql_col_data_type):
+        query = f"""ALTER TABLE {table_name} 
+                    ADD COLUMN {col_name} {sql_col_data_type}"""
+        self.cursor.execute(query)
+        self.commit()
+
+
+
     def insert_multiple_into_table(self, table_name,
                                     col_names:str or list,
                                     data:list):
@@ -289,6 +362,11 @@ class Database:
     def reset_table_id(self, table_name: str, auto_increment_starting_val=0):
         """! Use of commit method is required in order to apply changes in db"""
         self.cursor.execute(f"ALTER TABLE {table_name} AUTO_INCREMENT = {auto_increment_starting_val}")
+    
+    def detele_rows_containing(self, table_name, column_name, value):
+        """! Use of commit method is required in order to apply changes in db"""
+        query = f"""DELETE FROM {table_name}
+                    WHERE {column_name} = {value}"""
 
     def _dict_to_sql_statement(self, dictionary={}):
         """Used mainly with passed where statement in dict form.
